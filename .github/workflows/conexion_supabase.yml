@@ -1,0 +1,35 @@
+name: Conexion Supabase
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+
+  conexion:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Mostrar version PostgreSQL
+        run: psql --version
+
+      - name: Probar conexion
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          psql \
+          -h "${{ secrets.DB_HOST }}" \
+          -p "${{ secrets.DB_PORT }}" \
+          -U "${{ secrets.DB_USER }}" \
+          -d "${{ secrets.DB_NAME }}" \
+          -c "\dt"
