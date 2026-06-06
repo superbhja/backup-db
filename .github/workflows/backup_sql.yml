@@ -1,0 +1,53 @@
+name: Backup SQL
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+
+  backup:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Mostrar version PostgreSQL
+        run: |
+          psql --version
+          pg_dump --version
+
+      - name: Crear directorio temporal
+        run: |
+          mkdir -p temp
+
+      - name: Ejecutar pg_dump
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASS }}
+        run: |
+          pg_dump \
+            -h "${{ secrets.DB_HOST }}" \
+            -p "${{ secrets.DB_PORT }}" \
+            -U "${{ secrets.DB_USER }}" \
+            -d "${{ secrets.DB_NAME }}" \
+            -f temp/backup.sql
+
+      - name: Verificar archivo generado
+        run: |
+          ls -lh temp/backup.sql
+
+      - name: Mostrar primeras lineas
+        run: |
+          head -n 30 temp/backup.sql
+
+      - name: Mostrar ultimas lineas
+        run: |
+          tail -n 30 temp/backup.sql
