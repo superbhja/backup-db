@@ -1,0 +1,4 @@
+dump.sql
+*.tmp
+*.log
+__pycache__/
