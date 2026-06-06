@@ -1,4 +1,4 @@
-name: Backup SQL
+name: Backup SQL v1.1
 
 on:
 workflow_dispatch:
