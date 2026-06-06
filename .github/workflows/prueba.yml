@@ -1,0 +1,30 @@
+name: Prueba Ubuntu
+
+on:
+
+workflow_dispatch:
+
+jobs:
+
+prueba:
+
+```
+runs-on: ubuntu-latest
+
+steps:
+
+  - name: Fecha del sistema
+    run: date
+
+  - name: Version Linux
+    run: uname -a
+
+  - name: Usuario actual
+    run: whoami
+
+  - name: Directorio actual
+    run: pwd
+
+  - name: Version Python
+    run: python3 --version
+```
