@@ -1,53 +1,66 @@
 name: Backup SQL
 
 on:
-  workflow_dispatch:
-  push:
+workflow_dispatch:
+push:
 
 jobs:
 
-  backup:
+backup:
 
-    runs-on: ubuntu-latest
+```
+runs-on: ubuntu-latest
 
-    steps:
+steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4
+  - name: Checkout
+    uses: actions/checkout@v4
 
-      - name: Instalar PostgreSQL Client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
+  - name: Instalar PostgreSQL Client 17
+    run: |
+      sudo apt-get update
 
-      - name: Mostrar version PostgreSQL
-        run: |
-          psql --version
-          pg_dump --version
+      sudo install -d /usr/share/postgresql-common/pgdg
 
-      - name: Crear directorio temporal
-        run: |
-          mkdir -p temp
+      sudo curl -fsSL \
+        https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+        -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
 
-      - name: Ejecutar pg_dump
-        env:
-          PGPASSWORD: ${{ secrets.DB_PASS }}
-        run: |
-          pg_dump \
-            -h "${{ secrets.DB_HOST }}" \
-            -p "${{ secrets.DB_PORT }}" \
-            -U "${{ secrets.DB_USER }}" \
-            -d "${{ secrets.DB_NAME }}" \
-            -f temp/backup.sql
+      sudo sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 
-      - name: Verificar archivo generado
-        run: |
-          ls -lh temp/backup.sql
+      sudo apt-get update
 
-      - name: Mostrar primeras lineas
-        run: |
-          head -n 30 temp/backup.sql
+      sudo apt-get install -y postgresql-client-17
 
-      - name: Mostrar ultimas lineas
-        run: |
-          tail -n 30 temp/backup.sql
+  - name: Verificar versiones
+    run: |
+      psql --version
+      pg_dump --version
+
+  - name: Crear directorio temporal
+    run: |
+      mkdir -p temp
+
+  - name: Ejecutar pg_dump
+    env:
+      PGPASSWORD: ${{ secrets.DB_PASS }}
+    run: |
+      pg_dump \
+        -h "${{ secrets.DB_HOST }}" \
+        -p "${{ secrets.DB_PORT }}" \
+        -U "${{ secrets.DB_USER }}" \
+        -d "${{ secrets.DB_NAME }}" \
+        -f temp/backup.sql
+
+  - name: Verificar archivo generado
+    run: |
+      ls -lh temp/backup.sql
+
+  - name: Mostrar primeras lineas
+    run: |
+      head -n 20 temp/backup.sql
+
+  - name: Mostrar ultimas lineas
+    run: |
+      tail -n 20 temp/backup.sql
+```
