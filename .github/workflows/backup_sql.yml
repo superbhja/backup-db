@@ -1,35 +1,26 @@
-name: Backup SQL v1.1
+name: Backup SQL v1.2
 
 on:
 workflow_dispatch:
 push:
 
 jobs:
-
 backup:
-
-```
 runs-on: ubuntu-latest
 
 steps:
-
   - name: Checkout
     uses: actions/checkout@v4
 
   - name: Instalar PostgreSQL Client 17
     run: |
-      sudo apt-get update
-
       sudo install -d /usr/share/postgresql-common/pgdg
 
-      sudo curl -fsSL \
-        https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-        -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+      curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc > /dev/null
 
-      sudo sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+      echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
 
       sudo apt-get update
-
       sudo apt-get install -y postgresql-client-17
 
   - name: Verificar versiones
@@ -56,6 +47,10 @@ steps:
     run: |
       ls -lh temp/backup.sql
 
+  - name: Mostrar cantidad de lineas
+    run: |
+      wc -l temp/backup.sql
+
   - name: Mostrar primeras lineas
     run: |
       head -n 20 temp/backup.sql
@@ -63,4 +58,3 @@ steps:
   - name: Mostrar ultimas lineas
     run: |
       tail -n 20 temp/backup.sql
-```
