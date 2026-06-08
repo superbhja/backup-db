@@ -1,8 +1,9 @@
-name: Backup SQL v1.2
+name: Backup SQL v1.4
 
 on:
   workflow_dispatch:
-  push:
+  schedule:
+    - cron: "33 3 * * *"
 
 permissions:
   contents: write
