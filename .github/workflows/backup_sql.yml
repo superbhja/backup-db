@@ -1,4 +1,4 @@
-name: Backup SQL v1.4
+name: Backup SQL v1.5
 
 on:
   workflow_dispatch:
@@ -7,6 +7,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: backup-db
+  cancel-in-progress: false
 
 jobs:
   backup:
@@ -29,6 +33,9 @@ jobs:
           sudo sh -c "echo \"deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${CODENAME}-pgdg main\" > /etc/apt/sources.list.d/pgdg.list"
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17
+
+      - name: Priorizar pg_dump 17 en el PATH
+        run: echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
 
       - name: Verificar versiones
         run: |
@@ -76,5 +83,6 @@ jobs:
             echo "Sin cambios para commitear."
           else
             git commit -m "Backup automatico ${{ steps.ts.outputs.stamp }}"
-            git push
+            git pull --rebase origin main
+            git push origin main
           fi
